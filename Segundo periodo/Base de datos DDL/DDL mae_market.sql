@@ -1,0 +1,197 @@
+create database pmaemarket;
+use pmaemarket;
+
+create table persona(
+tipo_documento varchar(3) not null,
+n_documento int (15) not null,
+p_nombre varchar (25) not null,
+s_nombre varchar (25) null,
+p_apellido varchar (25) not null,
+s_apellido varchar (25) null,
+direccion varchar (20) not null,
+telefono int (20) not null,
+correo varchar (40) not null, 
+primary key(n_documento)
+);
+
+create table t_documento(
+id_t_documento varchar(3) not null,
+descripcion varchar(25) not null, 
+primary key(id_t_documento)
+);
+
+create table roles(
+id_rol varchar (5) not null,
+descripcion_rol varchar (15) not null,
+primary key(id_rol)
+);
+
+create table contratacion(
+fecha_contratacion date not null,
+cargo varchar(10) not null,
+descripcion text(200) null,
+persona_id_contratacion int(15) not null,
+primary key(persona_id_contratacion)
+);
+
+create table factura(
+n_factura varchar(10) not null,
+fecha_factura date not null,
+subtotal int(10) not null,
+iva int(10) not null, 
+recargo_domicilio int(10) not null, 
+total_factura int(10) not null, 
+forma_de_pago_factura varchar(10) not null,
+forma_de_entrega_factura varchar(15) not null,
+estado_factura varchar(10) not null,
+persona_rol_factura int(40) not null, 
+primary key (n_factura, persona_rol_factura)
+);
+
+create table estado_(
+id_estado_factura varchar(5) not null,
+descripcion_estado_f varchar(15) not null,
+primary key (id_estado_factura)
+); 
+
+create table forma_de_pago(
+id_forma_pago varchar(5) not null, 
+descripcion text(15) not null, 
+primary key (id_forma_pago)
+);
+
+create table forma_de_entrega(
+id_forma_entrega varchar (6) not null,
+descripcion text(20) not null, 
+primary key (id_forma_entrega)
+);
+
+create table productos(
+cod_producto varchar(10) not null,
+n_producto varchar(25) not null, 
+descripcion text(100) not null,
+precio_unitario int(10) not null,
+stock int (5) not null, 
+imagen varchar(1000) not null, 
+categoria_id_categoria varchar(8) not null, 
+primary key(cod_producto)
+);
+
+create table ingresos(
+id_ingresos varchar(7) not null,
+fecha_ingresos date not null,
+primary key (id_ingresos)
+);
+
+create table lote(
+id_lote varchar(5) not null,
+fecha_vencimiento date not null,
+estado_lote varchar(10) not null, 
+primary key(id_lote)
+); 
+ 
+create table estado(
+id_estado_lote varchar(5) not null,
+descripcion_estado_l varchar(15) not null,
+primary key(id_estado_lote)
+); 
+
+create table categorias(
+id_categoria varchar(8) not null,
+categoria varchar(30) not null,
+primary key (id_categoria)
+);
+
+create table relacion_productos_ingresos(
+producto_cod_producto varchar(10) not null, 
+ingreso_id_ingresos varchar(7) not null, 
+cantidad int(255) not null, 
+primary key (producto_cod_producto, ingreso_id_ingresos)
+);
+
+create table relacion_lote_producto(
+lote_id_lote varchar(5) not null, 
+lote_cod_producto varchar(10) not null, 
+cantidad int(255) not null, 
+primary key(lote_id_lote, lote_cod_producto)
+);
+
+create table relacion_persona_rol(
+persona_n_persona int(15) not null, 
+rol_id_rol varchar(5) not null, 
+estado boolean not null, 
+primary key (persona_n_persona,rol_id_rol)
+);
+
+create table detalle_factura(
+factura_n_factura varchar(10) not null,
+cod_producto_detalle varchar(10) not null,
+cantidad int(25) not null,
+valor_total int(10) not null,
+sub_total int(10) not null,
+primary key (factura_n_factura,cod_producto_detalle)
+);
+
+alter table persona add
+foreign key (tipo_documento)
+references t_documento(id_t_documento);
+
+alter table factura add
+foreign key (forma_de_entrega_factura)
+references forma_de_entrega(id_forma_entrega);
+
+alter table factura add
+foreign key (forma_de_pago_factura)
+references forma_de_pago(id_forma_pago);
+
+alter table detalle_factura add
+foreign key (factura_n_factura)
+references factura(n_factura);
+
+alter table detalle_factura add
+foreign key(cod_producto_detalle)
+references productos(cod_producto);
+
+alter table relacion_persona_rol add
+foreign key (rol_id_rol)
+references roles(id_rol);
+
+alter table relacion_persona_rol add
+foreign key (persona_n_persona)
+references persona(n_documento);
+
+alter table factura add
+foreign key (persona_rol_factura)
+references relacion_persona_rol(persona_n_persona);
+
+alter table productos add
+foreign key (categoria_id_categoria)
+references categorias(id_categoria);
+
+alter table contratacion add
+foreign key (persona_id_contratacion)
+references persona(n_documento);
+
+alter table relacion_productos_ingresos add
+foreign key (producto_cod_producto)
+references productos(cod_producto);
+
+alter table relacion_productos_ingresos add
+foreign key (ingreso_id_ingresos)
+references ingresos(id_ingresos); 
+
+alter table relacion_lote_producto add
+foreign key (lote_id_lote)
+references lote(id_lote);
+
+alter table relacion_lote_producto add
+foreign key(lote_cod_producto)
+references productos(cod_producto); 
+
+alter table factura add
+foreign key(estado_factura)
+references estado_(id_estado_factura); 
+
+alter table lote add
+foreign key(estado_lote)
+references estado(id_estado_lote); 
